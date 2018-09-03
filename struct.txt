@@ -1,0 +1,35 @@
+струтура таблиц accessRequest	префикс   AR
+	id
+	sd id
+	c id
+	initiator
+	dateopen
+	dateupdate
+	dateclose
+	operopen
+	operclose
+	operupdate
+	status
+	approvalstatus
+	recipient	text array получатели услуг
+	category		предоставление изменние отзыв
+	type		базовый расширеный ролевой
+	startdate дата предоствления доступа
+	enddate	дата окончания доступа
+	closure.code код закрытия
+	description text array обоснование
+	roles струтука
+		roles.logical.name text array
+		roles.ci.name	text array
+	cis структура
+		cis.role.id	text array
+		cis.role.name	text array
+		cis.bzs.id	text array
+		cis.bzs.name	text array
+		cis.acss.id	text array
+		cis.acss.name	text array
+		cis.right.id	text array
+		cis.right.name	text array
+	company компания иницатор
+	sysmodtime
+	sysmoduser
