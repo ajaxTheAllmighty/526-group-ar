@@ -11,19 +11,16 @@
 	operupdate
 	status
 	approvalstatus
-	recipient	text array получатели услуг
+	recipient	text получатели услуг
 	category		предоставление изменние отзыв
 	type		базовый расширеный ролевой
 	startdate дата предоствления доступа
 	enddate	дата окончания доступа
 	closure.code код закрытия
-	description text array обоснование
-	roles струтука
-		roles.logical.name text array
-		roles.ci.name	text array
+	description text array обосновани
+	role.logical.name text
+	role.ci.name	text
 	cis структура
-		cis.role.id	text array
-		cis.role.name	text array
 		cis.bzs.id	text array
 		cis.bzs.name	text array
 		cis.acss.id	text array
@@ -33,3 +30,7 @@
 	company компания иницатор
 	sysmodtime
 	sysmoduser
+
+
+
+замутить заполнение в таблице "услуга право обьект" линк или комбобоксы решить

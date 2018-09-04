@@ -5,3 +5,22 @@ create
 		ARUtils
 	fd
 		accessRequest
+		accessRequestGet
+		accessRequestGet-base
+		accessRequestGet-ext
+		accessRequestGet-roles
+		accessRequest-mod
+		accessRequest-mod-ext
+	triggers
+		accessRequest.b.a.setId
+	wizards
+		INF.accessRequest-get
+		INF.accessRequest-get-roles
+		INF.accessRequest-get-extended
+		INF.accessRequest-get-base
+		INF.accessRequest-mod
+		INF.accessRequest-mod-ext
+	ds
+		INF.accessRequest.mod.display
+	de
+		INF.accessRequest.mod.display_Custom
