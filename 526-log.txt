@@ -24,3 +24,5 @@ create
 		INF.accessRequest.mod.display
 	de
 		INF.accessRequest.mod.display_Custom
+	fc
+		accessRequest-mod-ext
