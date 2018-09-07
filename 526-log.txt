@@ -26,3 +26,8 @@ create
 		INF.accessRequest.mod.display_Custom
 	fc
 		accessRequest-mod-ext
+	link
+		accessRequestGet-ext
+		accessRequest-mod-ext
+		accessRequest-mod
+		accessRequestGet-roles
