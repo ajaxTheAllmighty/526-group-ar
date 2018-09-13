@@ -17,7 +17,7 @@
 	startdate дата предоствления доступа
 	enddate	дата окончания доступа
 	closure.code код закрытия
-	description text array обосновани
+	description text  обосновани
 	role.logical.name text
 	role.ci.name	text
 	cis структура
