@@ -1,44 +1,43 @@
 function showRoleContents(){
+	vars['$roleTable']=null;
+	vars['$serviceTable']=null;
+	vars['$accsTable']=null;
+	vars['$rightTable']=null;
 	var device = new SCFile('device');
+	var bzs = new SCFile('device');
+	var accs = new SCFile('device');
+	var right = new SCFile('device');
+	var roleIds = vars['$roleIds'];
+	if (typeof roleIds == 'string'){
+		var roleIds = new Array();
+		roleIds.push(vars['$roleIds']);
+	}
+	print(roleIds);
 	var data = [];
 	var dQuery;
-	var cnt = 0;
-	var sCR = "\n";
-	var sHtmlReturn = getCSS();
-	for var(i = 0; i < _lng(vars['$roles']); i++){
-		dQuery = device.doSelect('ci.name="'+vars['$roles'][i]+'"');
-
+	for (var i = 0; i < roleIds.length; i++){
+		dQuery = device.doSelect('logical.name="'+roleIds[i]+'"');
+		if(dQuery == RC_SUCCESS){
+			do{
+				for(var bzsCount = 0; bzsCount<device['bzs.id'].length(); bzsCount++){
+					var rc = bzs.doSelect('logical.name="'+device['bzs.id'][i]+'"');
+					var rcc = accs.doSelect('logical.name="'+device['accs.id'][i]+'"');
+					var rrc = right.doSelect('logical.name="'+device['right.id'][i]+'"');
+					if (rc == RC_SUCCESS && rrc == RC_SUCCESS && rcc == RC_SUCCESS){
+						do{
+							vars['$roleTable'] = _ins(vars['$roleTable'],0,1,device['ci.name']);
+							vars['$serviceTable'] = _ins(vars['$serviceTable'],0,1,bzs['ci.name']);
+							vars['$accsTable'] = _ins(vars['$accsTable'],0,1,accs['ci.name']);
+							vars['$rightTable'] = _ins(vars['$rightTable'],0,1,right['ci.name']);
+							print(device['logical.name']);
+						}while(bzs.getNext() == RC_SUCCESS && accs.getNext() == RC_SUCCESS && right.getNext() == RC_SUCCESS)
+					}
+				}
+			}while(device.getNext() == RC_SUCCESS)
+		}
 	}
-	sHtmlReturn += "<table class=\"main\">" + sCR;
-	// Table header
-	sHtmlReturn += "<tr><th><div tabindex=\"0\"> Test </div></th>"
-	sHtmlReturn += "<th><div tabindex=\"0\"> Наименование ПО </div></th>"
-	sHtmlReturn += "<th><div tabindex=\"0\"> Версия ПО </div></th>"
-	sHtmlReturn += "<th><div tabindex=\"0\"> Статус </div></th>";
-	for (var i =0; i<data.length; i++) {
-		var sRowClass = i%2==0 ? "evenRow" : "oddRow";
-			sHtmlReturn += "<tr>";
-			 sHtmlReturn += "<td class=\""+sRowClass+"\" + text-align:center > <a href=\"scactivelink://sccmSoftware:"+data[i]['key']+"\">Добавить</a></td>";
-			if(data[i]['name']!=null){
-				sHtmlReturn += "<td class=\""+sRowClass+"\" >"+data[i]['name']+"</td>";		//ResourceID
-			}
-			else{
-				sHtmlReturn += "<td class=\""+sRowClass+"\" > </td>";
-			}
-			if(data[i]['ver']!=null){
-				sHtmlReturn += "<td class=\""+sRowClass+"\" >"+data[i]['ver']+"</td>";	//SerialNumber0
-			}
-			else{
-				sHtmlReturn += "<td class=\""+sRowClass+"\" > </td>";
-			}
-			if(data[i]['status']!=null){
-				sHtmlReturn += "<td class=\""+sRowClass+"\" >"+data[i]['status']+"</td>";		//Model00
-			}
-			else{
-				sHtmlReturn += "<td class=\""+sRowClass+"\" > </td>";
-			}
-			sHtmlReturn += "<tr>";
-	}
-	sHtmlReturn += "</table>" + sCR;
-	return sHtmlReturn;
+	print(vars['$roleTable']);
+	print(vars['$serviceTable']);
+	print(vars['$accsTable']);
+	print(vars['$rightTable']);
 }
