@@ -2,18 +2,26 @@ function extAccessTable(){
 	var file = new SCFile('Subscription');
 	var cont = new SCFile('contacts');
 	cont.doSelect('full.name="'+vars['$recipient']+'"');
-	var data = [];
-	var cnt = 0;
-	var sCR = "\n";
-	var sHtmlReturn = getCSS();
+	//var data = [];
+	//var cnt = 0;
+	//var sCR = "\n";
+	//var sHtmlReturn = getCSS();
 	var rc = file.doSelect('subscriber="'+cont['contact.name']+'" and type="Расширенный доступ"');
 	if(rc==RC_SUCCESS){
 		do{
-			data[cnt] = {id:file['subscriptionID'],serv:file['displayName'],acss:file['acss.name'],right:file['right.name']};
-			cnt++;
+			//data[cnt] = {id:file['subscriptionID'],serv:file['displayName'],acss:file['acss.name'],right:file['right.name']};
+			//cnt++;
+			vars['$bzs'] = _ins(vars['$bzs'],file['displayName']);
+			vars['$bzsID'] = _ins(vars['$bzsID'],file['serviceName']);
+			vars['$accs'] = _ins(vars['$accs'],file['acss.name']);
+			vars['$accsID'] = _ins(vars['$accsID'],file['acss.id']);
+			vars['$right'] = _ins(vars['$right'],file['right.name']);
+			vars['$rightID'] = _ins(vars['$rightID'],file['right.id']);
+			vars['$subId'] = _ins(vars['$subId'],file['subscriptionID']);
 		}while(file.getNext() == RC_SUCCESS)
 	}
-	sHtmlReturn += "<table class=\"main\">" + sCR;
+}
+	/*sHtmlReturn += "<table class=\"main\">" + sCR;
 	// Table header
 	sHtmlReturn += "<tr><th><div tabindex=\"0\"> Действие </div></th>"
 	sHtmlReturn += "<th><div tabindex=\"0\"> Услуга </div></th>"
@@ -45,4 +53,4 @@ function extAccessTable(){
 	}
 	sHtmlReturn += "</table>" + sCR;
 	return sHtmlReturn;
-}
+}*/

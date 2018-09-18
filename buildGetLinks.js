@@ -75,7 +75,7 @@ function getExtAccess_buldLinkQuery__accs(id){
 	return arr;
 }
 
-function getExtAccess_buldLinkQuery__right(id){
+function getExtAccess_buldLinkQuery__right(id,serviceId){
 	var arr = new Array;
 	var rel = new SCFile('cirelationship');
 	var device = new SCFile('device');
@@ -85,12 +85,24 @@ function getExtAccess_buldLinkQuery__right(id){
 			var rcc = device.doSelect('type="right" and logical.name="'+rel['related.cis'][0]+'"  and (istatus="Эксплуатация" or istatus="Опытная экспл.") and company ="'+vars['$lo.operator']['company']+'"');
 			if(rcc == RC_SUCCESS){
 				do{
-					arr.push(device['ci.name']);
+					arr.push(device['logical.name']);
 				}while(device.getNext() == RC_SUCCESS)
 			}
 		}while(rel.getNext()==RC_SUCCESS)
 	}
-	print(arr.join(','));
+	if(arr.length < 1){
+		var serviceRel = new SCFile('cirelationship');
+		var servicreQuery = serviceRel.doSelect('logical.name="'+serviceId+'"');
+		if(servicreQuery == RC_SUCCESS){
+			var right = new SCFile('device');
+			var rightQuery = right.doSelect('type="right" and logical.name="'+serviceRel['related.cis'][0]+'"  and (istatus="Эксплуатация" or istatus="Опытная экспл.") and company ="'+vars['$lo.operator']['company']+'"')
+			if(rightQuery == RC_SUCCESS){
+				do{
+					arr.push(right['logical.name']);
+				}while(right.getNext() == RC_SUCCESS)
+			}
+		}
+	}
 	return arr;
 }
 
