@@ -1,22 +1,24 @@
-//test([[1,['bzs11','bzs12','bzs13'],['acs11','acs12','acs13'],['ri11','ri12','ri13']], [2,['bzs21','bzs22','bzs23'],['acs21','acs22','acs23'],['ri21','ri22','ri23']]]);
-function getCommonItems(input,count){
+function getCommonItems(input){
+
+	var index=[];
 	var match = 1;
 	var out = [];
-	var index = [];
-	for (var i = 0; i < input.length; i++){
-		for(var j = 1; j < input[i].length; j++){
-			for(var k = 0; k < input[i][j]; k++){
-				for(var itemCount = 1; itemCount < count; itemCount++){
-					if(input[i][j][k].indexOf(input[itemCount][j][k])!=-1){
-						index[0] = k;
-						index.push(input[i][j][k].indexOf(input[itemCount][j][k]));
-						match++;
-						if(match == count){
-							if(findAccess(input,index)){
-								for(var indexCount = 0; i < index.length; indexCount++){
-									out.push([input[indexCount][1][indexCount],input[indexCount][2][indexCount],input[indexCount][3][indexCount]]);
-								}
-							}
+	for(var i=0; i < input.length; i++){
+
+		for(var k=0; k<input[i][1].length; k++){
+
+			match = 1;
+			for(var next = i+1; next<input.length; next++){
+				if(input[i][1][k] == input[next][1][k]){
+					index = (k);
+
+					match++;
+
+					if(match == input.length){
+						if(findAccess(input,k,index)){
+
+							out.push(input[i][1][k],input[i][2][k],input[i][3][k]);
+							match = 1;
 						}
 					}
 				}
@@ -27,28 +29,32 @@ function getCommonItems(input,count){
 }
 
 function findAccess(input,originalIndex,index){
-	var match = 0;
-	for(var i = 0; i <input.length; i++){
-		for(var j = i+1; j < input.length; j++){
-			if(input[i][2][originalIndex]==input[j][2][index[i]]){
-				print('match accs '+input[i][2][originalIndex] +' '+input[i][2][index[i]]);
+	var match = 1;
+		for(var j = 1; j < input.length; j++){
+
+			if(input[0][2][originalIndex]==input[j][2][index]){
+
 				match++;
-				if(match == index.length){
+
+				if(match == input.length){
 					return findRight(input,originalIndex,index);
 				}
 			}
+			else match = 0;
 		}
-	}
 }
 
-function findRight(input,index){
+function findRight(input,originalIndex,index){
 	var match = 1;
-	for(var i = 0; i <input.length; i++){
-		for(var j = i+1; j <input.length; j++){
-			if(input[i][3][index[i]].indexOf(input[j][3][index[i]])!= -1){
+
+		for(var j = 1; j <input.length; j++){
+
+			if(input[0][3][originalIndex]==input[j][3][index]){
+
 				match++;
-				if(match == index.length) return true;
+
+				if(match == input.length) return true;
 			}
+			else match = 0;
 		}
-	}
 }
