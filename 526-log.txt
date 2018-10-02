@@ -11,21 +11,30 @@ create
 		accessRequestGet-roles
 		accessRequest-mod
 		accessRequest-rm
+		accessRequest-rm-ext
 		accessRequest-mod-ext
-	triggers
-		accessRequest.b.a.setId
+		accessRequest-mod-actions
+		accessRequest-get-ext-results
+		accessRequest-get-role-results
+		accessRequest-mod-results
+		accessRequest-rm-results
 	wizards
 		INF.accessRequest-get
 		INF.accessRequest-get-roles
-		INF.accessRequest-get-extended
+		INF.accessRequest-get-ext
 		INF.accessRequest-get-base
 		INF.accessRequest-mod
 		INF.accessRequest-rm
-		INF.accessRequest-mod-ext
+		INF.accessRequest-mod-actions
+		INF.accessRequest-rm-after
+		INF.accessRequest-mod-actions-after
+		INF.accessRequest-get-roles-after
+		INF.accessRequest-get-ext-after
 	ds
 		INF.acccesRequest-get-ext
 		INF.accessRequest-mod-ext
 		INF.accessRequest-rm
+		INF.acccesRequest-get-roles
 	do
 		INF.acccesRequest-get-ext_add
 		INF.acccesRequest-get-ext_delete
@@ -36,9 +45,15 @@ create
 		INF.accessRequest.mod.display_Custom
 		INF.accessRequest-rm_Custom
 	fc
-		accessRequest-mod-ext
+		accessRequest-mod-actions
+		accessRequestGet-ext
+		accessRequestGet-roles
+		accessRequest-rm
+		accessRequest-rm-ext
+
 	link
 		accessRequestGet-ext
 		accessRequest-mod-ext
 		accessRequest-mod
 		accessRequestGet-roles
+		accessRequest-rm
