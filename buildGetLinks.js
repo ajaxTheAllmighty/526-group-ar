@@ -119,11 +119,47 @@ function initializeCombo(){
 }
 
 
+
+
 function getExtAccess__addToTable(sID,sName,aID,aName,rID,rName){
-	vars['$serviceIDs'] = _ins(vars['$serviceIDs'],0,1,sID);
-	vars['$serviceNames'] = _ins(vars['$serviceNames'],0,1,sName);
-	vars['$acssIDs'] = _ins(vars['$acssIDs'],0,1,aID);
-	vars['$acssNames'] = _ins(vars['$acssNames'],0,1,aName);
-	vars['$rightIDs'] = _ins(vars['$rightIDs'],0,1,rID);
-	vars['$rightNames'] = _ins(vars['$rightNames'],0,1,rName);
+	var success = true;
+	var sIDtemp,sNametemp,aIDtemp,aNametemp,rIDtemp,rNametemp;
+	if((sID != null) && (sName != null) && (aID != null) && (aName != null) && (rID != null) && (rName != null)){
+		if(_getvalCustom(sID,'device','logical.name','ci_name') != false && _getvalCustom(sID,'device','logical.name','ci_name') == sName && success){
+			sIDtemp = sID
+			sNametemp = sName;
+		}
+		else{
+			success = false
+			print('Некорректное значение \"Услуга\"');
+		}
+		if(_getvalCustom(aID,'device','logical.name','ci_name') != false && _getvalCustom(aID,'device','logical.name','ci_name') == aName && success){
+			aIDtemp = aID;
+			aNametemp = aName;
+		}
+		else{
+			success = false
+			print('Некорректное значение \"Обьект доступа\"')
+		}
+		if(_getvalCustom(rID,'device','logical.name','ci_name') != false && _getvalCustom(rID,'device','logical.name','ci_name') == rName && success){
+			rIDtemp = rID;
+			rNametemp = rName;
+		}
+		else{
+			success = false
+			print('Некорректное значение \"Право доступа\"')
+		}
+	}
+	else{
+		print('Атрибуты \"Услуга\", \"Обьект доступа\" или \"Право доступа\" не могут быть пустыми!');
+	}
+
+	if(success){
+		vars['$serviceIDs'] = _ins(vars['$serviceIDs'],0,1,sIDtemp);
+		vars['$serviceNames'] = _ins(vars['$serviceNames'],0,1,sNametemp);
+		vars['$acssIDs'] = _ins(vars['$acssIDs'],0,1,aIDtemp);
+		vars['$acssNames'] = _ins(vars['$acssNames'],0,1,aNametemp);
+		vars['$rightIDs'] = _ins(vars['$rightIDs'],0,1,rIDtemp);
+		vars['$rightNames'] = _ins(vars['$rightNames'],0,1,rNametemp);
+	}
 }

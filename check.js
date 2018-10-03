@@ -1,23 +1,23 @@
-function createARGetExt(recipents,serviceIds,serviceNames,accsIds,acssNames,rightIds,rightNames,desc,start,end){
+function createARGetExt(serviceIds,serviceNames,accsIds,acssNames,rightIds,rightNames,desc,start,end){
 	var rejectedAR = [];
 	var rejectedARSUB = [];
 	var approvedAR = [];
 	var successCount = 0;
 	var file = new SCFile('accessRequest');
 	//print(serviceIds.length());
-	for(var recipientCount = 0; recipientCount < recipents.length(); recipientCount++){
+	for(var recipientCount = 0; recipientCount < _lng(vars['$recIDs']); recipientCount++){
 		for(var attribCount = 0; attribCount < serviceIds.length(); attribCount++){
 			var f = new SCFile('accessRequest');
-			var rcc = f.doSelect('recipent="'+recipents[i]+'" and cis.bzs.id="'+serviceIds[attribCount]+'" and cis.acss.id="'+accsIds[attribCount]+'" and cis.right.id="'+rightIds[attribCount]+'" and category="Предоставление"')
+			var rcc = f.doSelect('recipient="'+vars['$recIDs'][i]+'" and cis.bzs.id="'+serviceIds[attribCount]+'" and cis.acss.id="'+accsIds[attribCount]+'" and cis.right.id="'+rightIds[attribCount]+'" and category="Предоставление"')
 			if(rcc != RC_SUCCESS){
 				var s = new SCFile('Subscription');
-				var rrc = s.doSelect('subscriber="'+recipents[i]+'" and serviceName="'+serviceIds[attribCount]+'" and acss.id="'+accsIds[attribCount]+'" and right.id="'+rightIds[attribCount]+'"')
+				var rrc = s.doSelect('subscriber="'+vars['$recIDs'][i]+'" and serviceName="'+serviceIds[attribCount]+'" and acss.id="'+accsIds[attribCount]+'" and right.id="'+rightIds[attribCount]+'" and type="Расширенный доступ" and active=true')
 				if(rrc != RC_SUCCESS){
-				file['id'] = lib.ARUtils.GetNextNumber('accessRequest');
+					file['id'] = lib.ARUtils.GetNextNumber('accessRequest');
 					file['initiator'] = _op();
 					file['date.open'] = _tod();
 					file['oper.open'] = _op();
-					file['recipient'] = recipents[recipientCount];
+					file['recipient'] = vars['$recIDs'][recipientCount];
 					file['category'] = 'Предоставление';	//предоставление изменние отзыв
 					file['type'] = 'Расширеный';		//базовый расширеный ролевой
 					file['description'] = desc;

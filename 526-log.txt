@@ -18,6 +18,7 @@ create
 		accessRequest-get-role-results
 		accessRequest-mod-results
 		accessRequest-rm-results
+		accessRequest-vj
 	wizards
 		INF.accessRequest-get
 		INF.accessRequest-get-roles
@@ -57,3 +58,7 @@ create
 		accessRequest-mod
 		accessRequestGet-roles
 		accessRequest-rm
+mod
+	fd
+		sd.interaction.categorization
+		sd.interaction.logging
