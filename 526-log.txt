@@ -31,6 +31,7 @@ create
 		INF.accessRequest-mod-actions-after
 		INF.accessRequest-get-roles-after
 		INF.accessRequest-get-ext-after
+		INF.accessRequest-intialize-cm3t
 	ds
 		INF.acccesRequest-get-ext
 		INF.accessRequest-mod-ext
