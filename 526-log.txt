@@ -62,3 +62,16 @@ mod
 	fd
 		sd.interaction.categorization
 		sd.interaction.logging
+		sd.interaction.workinprogress
+		sd.interaction.review
+		sd.interaction.withdrawal
+		sd.interaction.closure
+		chm.open
+		chm.update
+	link
+		incidents
+		cm3r
+
+ручные действия
+	на таблицу incidents создать алиас incident.id.ar.vj
+	на таблицу cm3r создать алиас number.ar.vj
