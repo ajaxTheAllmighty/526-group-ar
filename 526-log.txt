@@ -69,10 +69,13 @@ mod
 		sd.interaction.closure
 		chm.open
 		chm.update
+		chm.task
 	link
 		incidents
 		cm3r
+		cm3t
 
 ручные действия
 	на таблицу incidents создать алиас incident.id.ar.vj
 	на таблицу cm3r создать алиас number.ar.vj
+	на таблицу cm3t создать алиас parent.change.ar.vj
