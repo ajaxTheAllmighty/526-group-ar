@@ -19,6 +19,7 @@ create
 		accessRequest-mod-results
 		accessRequest-rm-results
 		accessRequest-vj
+		accessRequest-fromSD-select
 	wizards
 		INF.accessRequest-get
 		INF.accessRequest-get-roles
@@ -32,6 +33,7 @@ create
 		INF.accessRequest-get-roles-after
 		INF.accessRequest-get-ext-after
 		INF.accessRequest-intialize-cm3t
+		INF.accessRequest-fromSD-select
 	ds
 		INF.acccesRequest-get-ext
 		INF.accessRequest-mod-ext
@@ -59,6 +61,11 @@ create
 		accessRequest-mod
 		accessRequestGet-roles
 		accessRequest-rm
+	ruleset
+		inf.ar.create.from.sd
+		inf.ar.close
+	changeModel
+		Управление доступом
 mod
 	fd
 		sd.interaction.categorization
@@ -74,7 +81,8 @@ mod
 		incidents
 		cm3r
 		cm3t
-
+	workflow
+		DDC Service Desk
 ручные действия
 	на таблицу incidents создать алиас incident.id.ar.vj
 	на таблицу cm3r создать алиас number.ar.vj

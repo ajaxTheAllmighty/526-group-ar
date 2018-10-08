@@ -9,7 +9,7 @@
 	operopen
 	operclose
 	operupdate
-	status
+	status		открыт закрыт
 	approvalstatus
 	recipient	text получатели услуг
 	category		предоставление изменние отзыв
