@@ -20,6 +20,9 @@ create
 		accessRequest-rm-results
 		accessRequest-vj
 		accessRequest-fromSD-select
+		inf.cm3t.bzs.vj
+		inf.cm3t.accs.vj
+		inf.cm3t.right.vj
 	wizards
 		INF.accessRequest-get
 		INF.accessRequest-get-roles
@@ -61,12 +64,30 @@ create
 		accessRequest-mod
 		accessRequestGet-roles
 		accessRequest-rm
+		inf.cm3t.bzs.vj
+		inf.cm3t.accs.vj
+		inf.cm3t.right.vj
 	ruleset
 		inf.ar.create.from.sd
 		inf.ar.close
+		inf.create.tasks
+		inf.create.subscr
 	changeModel
 		Управление доступом
+	cm3tcategory
+		Расширеный доступ
+		Ролевой доступ
+	sdSubcategory:
+ 		access request
+	scmessage:
+		massage.id=access request;request for change
+	triggers
+		inf.after.add.updateCID_AR
 mod
+	sdCategory:
+ 		request for change
+	screlconfig:
+ 		cm3r
 	fd
 		sd.interaction.categorization
 		sd.interaction.logging
@@ -83,7 +104,14 @@ mod
 		cm3t
 	workflow
 		DDC Service Desk
+		DDC Generic Task
+		INF Standard Change
+	dbdict
+		cm3t
+			bzs.id accs.id right.id	text
 ручные действия
 	на таблицу incidents создать алиас incident.id.ar.vj
 	на таблицу cm3r создать алиас number.ar.vj
 	на таблицу cm3t создать алиас parent.change.ar.vj
+	перестроить gl Interaction Local Subcategories
+	выполнить команду *aapm.server.initer и перезайти в клиент
