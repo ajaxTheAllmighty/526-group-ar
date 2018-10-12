@@ -576,6 +576,7 @@ function getExtAccess__removeFromTable(element){
 	vars['$rightNames'] = rightName;
 }
 
+//	запрос расширеного доступа
 function createARGetExt(serviceIds,serviceNames,accsIds,acssNames,rightIds,rightNames,desc,start,end){
 	var incidentID;
 	var inc = new SCFile('incidents');
@@ -585,22 +586,20 @@ function createARGetExt(serviceIds,serviceNames,accsIds,acssNames,rightIds,right
 	if(rc == RC_SUCCESS){
 		do{
 			if(compound['related.cis'][0].search('oprtn')!=-1){
-				var temp = _getval(compound['rela'],'device','logical.name','ci_name')
+				var temp = _getval(compound['related.cis'][0],'device','logical.name','ci_name')
 				if(temp == 'Управление доступом'){
 					inc['inf.item.compound'] = compound['related.cis'][0]
 				}
 			}
 		}while(compound.getNext() == RC_SUCCESS)
 	}
-	//inc['category'] =
-	//inc['subcategory'] =
 	inc['callback.contact'] = _op();
 	inc['title'] = 'Изменение доступа';
 	inc['description'][0] = vars['$reason'];
 	inc['contact.name'] = _op()
 	inc['affected.item'] = affItem
-	inc['category'] = 'Change'
-	inc['subcategory'] = 'Access'
+	inc['category'] = 'request for change'
+	inc['subcategory'] = 'access request'
 	inc['severity'] = 'Средняя'
 	inc['ci.name'] = _getval(affItem,'device','logical.name','ci_name');
 
@@ -615,7 +614,7 @@ function createARGetExt(serviceIds,serviceNames,accsIds,acssNames,rightIds,right
 	for(var recipientCount = 0; recipientCount < _lng(vars['$recIDs']); recipientCount++){
 		for(var attribCount = 0; attribCount < serviceIds.length(); attribCount++){
 			var f = new SCFile('accessRequest');
-			var rcc = f.doSelect('recipient="'+vars['$recIDs'][i]+'" and cis.bzs.id="'+serviceIds[attribCount]+'" and cis.acss.id="'+accsIds[attribCount]+'" and cis.right.id="'+rightIds[attribCount]+'" and category="Предоставление"')
+			var rcc = f.doSelect('recipient="'+vars['$recIDs'][i]+'" and cis.bzs.id="'+serviceIds[attribCount]+'" and cis.acss.id="'+accsIds[attribCount]+'" and cis.right.id="'+rightIds[attribCount]+'" and category="Предоставление"  and active=true')
 			if(rcc != RC_SUCCESS){
 				var s = new SCFile('Subscription');
 				var rrc = s.doSelect('subscriber="'+vars['$recIDs'][i]+'" and serviceName="'+serviceIds[attribCount]+'" and acss.id="'+accsIds[attribCount]+'" and right.id="'+rightIds[attribCount]+'" and type="Расширенный доступ" and active=true')
@@ -684,6 +683,7 @@ function createARGetExt(serviceIds,serviceNames,accsIds,acssNames,rightIds,right
 	}
 	for(var i = 0; i < approvedAR.length; i++){
 		var f = new SCFile('accessRequest');
+		//print('select ' +approvedAR[i]);
 		var rc = f.doSelect('id="'+approvedAR[i]+'"')
 		if(rc == RC_SUCCESS){
 			vars['$bzsApr'] = _ins(vars['$bzsApr'],0,1,f['cis.bzs.name']);
@@ -691,13 +691,11 @@ function createARGetExt(serviceIds,serviceNames,accsIds,acssNames,rightIds,right
 			vars['$rightApr'] = _ins(vars['$rightApr'],0,1,f['cis.right.name'])
 			vars['$extDateApr'] = _ins(vars['$extDateApr'],0,1,f['date.open']);
 			vars['$extRecipientApr'] = _ins(vars['$extRecipientApr'],0,1,_getval(f['recipient'],'contacts','contact.name','full_name'))
-			var ar = new SCFile('accessRequest');
-			var upd = ar.doSelect('id="'+approvedAR[i]+'" and category="Запрос"');
-			ar['sd.id'] = incidentID;
-			ar.doUpdate();
+			print('push into vars');
+			f['sd.id'] = incidentID;
+			var ff = f.doUpdate();
 		}
 	}
-
 }
 
 
@@ -805,6 +803,7 @@ function selectRm(id){
 	}
 }
 
+//	запрос ролевого доступа
 function createARGetRoles(recipents,roles,roleNames,desc,start,end){
 	var incidentID;
 	var inc = new SCFile('incidents');
@@ -828,8 +827,8 @@ function createARGetRoles(recipents,roles,roleNames,desc,start,end){
 	inc['description'][0] = vars['$reason'];
 	inc['contact.name'] = _op()
 	inc['affected.item'] = affItem
-	inc['category'] = 'Change'
-	inc['subcategory'] = 'Access'
+	inc['category'] = 'request for change'
+	inc['subcategory'] = 'access request'
 	inc['severity'] = 'Средняя'
 	inc['ci.name'] = _getval(affItem,'device','logical.name','ci_name');
 	//inc.doAction('add');
@@ -848,7 +847,7 @@ function createARGetRoles(recipents,roles,roleNames,desc,start,end){
 	for(var recipientCount = 0; recipientCount < recipents.length(); recipientCount++){
 		for(var attribCount = 0; attribCount < rolesArray.length; attribCount++){
 			var f = new SCFile('accessRequest');
-			var rcc = f.doSelect('recipient="'+recipents[i]+'" and role.logical.name="'+rolesArray[attribCount]+'" and category="Предоставление"')
+			var rcc = f.doSelect('recipient="'+recipents[i]+'" and role.logical.name="'+rolesArray[attribCount]+'" and category="Предоставление"  and active=true')
 			if(rcc != RC_SUCCESS){
 				var s = new SCFile('Subscription');
 				var rrc = s.doSelect('subscriber="'+recipents[i]+'" and role.id="'+rolesArray[attribCount]+'"')
@@ -917,8 +916,8 @@ function createARGetRoles(recipents,roles,roleNames,desc,start,end){
 			vars['$roleRecipientApr'] = _ins(vars['$roleRecipientApr'],0,1,_getval(f['recipient'],'contacts','contact.name','full_name'))
 			var ar = new SCFile('accessRequest');
 			var upd = ar.doSelect('id="'+approvedAR[i]+'" and category="Изменение"');
-			ar['sd.id'] = incidentID;
-			ar.doUpdate();
+			f['sd.id'] = incidentID;
+			f.doUpdate();
 		}
 	}
 
@@ -927,7 +926,7 @@ function createARGetRoles(recipents,roles,roleNames,desc,start,end){
 
 
 function buildRemoveTable__ext(recipients){
-	print('rec ids = '+vars['$recIDs']);
+	//print('rec ids = '+vars['$recIDs']);
 	var subscribers = [];
 	var subscriptionIDs = [];
 	var recIDs=[];
@@ -1221,6 +1220,14 @@ function prepareModVars(){
 }
 
 function fillModForm(){
+	//print('actions = '+vars['$action']);
+	var tempAction = 0;
+	for(var i = 0 ; i < _lng(vars['$action']); i++){
+		if(vars['$action'][i] == 'remove'){
+			tempAction++
+		}
+	}
+	//print('tempaction = '+tempAction);
 	var test1 = _lng(vars['$lo.subscriber']);
 	var test2 = _lng(vars['$lo.subscriberID']);
 	var test3 = _lng(vars['$lo.roleSubscriber']);
@@ -1233,20 +1240,15 @@ function fillModForm(){
 			vars['$right'] = _ins(vars['$right'],0,1,f['right.name']);
 			vars['oldDate'] = _ins(vars['oldDate'],0,1,f['plan.close.date']);
 			vars['$recipient'] = _ins(vars['$recipient'],0,1,_getval(f['subscriber'],'contacts','contact.name','full_name'));
-			if(test1 == test2 && test3 == 0){
-				//print('right change allowed');
+			if((test1 == test2) && (test3 == 0) && (tempAction == 1)){
 				vars['$rightReadOnly'] = false;
 				var rel = new SCFile('cirelationship');
 				var rcc = rel.doSelect('logical.name="'+f['acss.id']+'"');
 				if(rcc == RC_SUCCESS){
-					//print('relation ok');
 					do{
 						var d = new SCFile('device');
-						//print('search '+rel['related.cis'][0]);
 						var rrc = d.doSelect('logical.name="'+rel['related.cis'][0]+'" and company="'+vars['$lo.company']+'" and (istatus="Эксплуатация" or istatus="Опытная экспл.") and type="right"');
 						if(rrc == RC_SUCCESS){
-						//	print('device ok');
-							//print('add '+d['ci.name']+' '+d['logical.name']);
 							vars['$rightNames'] = _ins(vars['$rightNames'],0,1,d['ci.name']);
 							vars['$rightIDs'] = _ins(vars['$rightIDs'],0,1,d['logical.name']);
 						}
@@ -1256,7 +1258,6 @@ function fillModForm(){
 		}
 		vars['$rightNames'] = uniqueArray(vars['$rightNames'].toArray());
 		vars['$rightIDs'] = uniqueArray(vars['$rightIDs'].toArray());
-		// COMBAK: доюавить наполнение ролей
 		for(var i = 0; i < _lng(vars['$lo.roleSubscriber']); i++){
 			var f = new SCFile('Subscription');
 			var rc = f.doSelect('subscriptionID="'+vars['$lo.roleSubscriberID'][i]+'"')
@@ -1268,6 +1269,7 @@ function fillModForm(){
 }
 
 
+//	изменение доступа
 function createARMod(){
 	var incidentID;
 	var inc = new SCFile('incidents');
@@ -1291,8 +1293,8 @@ function createARMod(){
 	inc['description'][0] = vars['$reason'];
 	inc['contact.name'] = _op()
 	inc['affected.item'] = affItem
-	inc['category'] = 'Change'
-	inc['subcategory'] = 'Access'
+	inc['category'] = 'request for change'
+	inc['subcategory'] = 'access request'
 	inc['severity'] = 'Средняя'
 	inc['ci.name'] = _getval(affItem,'device','logical.name','ci_name');
 	//inc.doAction('add');
@@ -1309,7 +1311,7 @@ function createARMod(){
 		for (var i = 0; i < _lng(vars['$lo.subscriber']); i++){
 			if(vars['$newRight']!=null){
 				var f = new SCFile('accessRequest');
-				var rcc = f.doSelect('subscription.id="'+vars['$lo.subscriberID'][i]+'" and category="Изменение" and cis.right.id="'+vars['$rightID'][_index(vars['$newRight'],vars['$rightNames'])-1]+'"')
+				var rcc = f.doSelect('subscription.id="'+vars['$lo.subscriberID'][i]+'" and category="Изменение" and cis.right.id="'+vars['$rightID'][_index(vars['$newRight'],vars['$rightNames'])-1]+'"  and active=true')
 				if(rcc != RC_SUCCESS){
 					file['id'] = lib.ARUtils.GetNextNumber('accessRequest');
 					file['cis.bzs.id'][0] = _getval(vars['$lo.subscriberID'][i],'Subscription','subscriptionID','serviceName');
@@ -1345,7 +1347,7 @@ function createARMod(){
 			}
 			else{
 			var f = new SCFile('accessRequest');
-			var rcc = f.doSelect('subscription.id="'+vars['$lo.subscriberID'][i]+'" and category="Изменение"')
+			var rcc = f.doSelect('subscription.id="'+vars['$lo.subscriberID'][i]+'" and category="Изменение"  and active=true')
 				if(rcc != RC_SUCCESS){
 					file['id'] = lib.ARUtils.GetNextNumber('accessRequest');
 					file['cis.bzs.id'][0] = _getval(vars['$lo.subscriberID'][i],'Subscription','subscriptionID','serviceName');
@@ -1382,8 +1384,9 @@ function createARMod(){
 
 	for(var i = 0; i < _lng(vars['$lo.roleSubscriber']); i++){
 		var f = new SCFile('accessRequest');
-		var rcc = f.doSelect('subscription.id="'+vars['$lo.roleSubscriberID'][i]+'" and category="Изменение"')
+		var rcc = f.doSelect('subscription.id="'+vars['$lo.roleSubscriberID'][i]+'" and category="Изменение"  and active=true')
 		if(rcc != RC_SUCCESS){
+			file['id'] = lib.ARUtils.GetNextNumber('accessRequest');
 			file['recipient'] = vars['$lo.roleSubscriber'][i];
 			file['category'] = 'Изменение';	//предоставление изменние отзыв
 			file['type'] = 'Ролевой';		//базовый расширеный ролевой
@@ -1398,6 +1401,7 @@ function createARMod(){
 			file['role.logical.name'] = _getval(vars['$lo.roleSubscriberID'][i],'Subscription','subscriptionID','role_id');
 			var rc = file.doInsert();
 			if(rc == RC_SUCCESS){
+				approvedARRole.push(file['subscription.id']);
 				successCount++
 			}
 		}
@@ -1444,7 +1448,7 @@ function createARMod(){
 			vars['$extDateApr'] = _ins(vars['$extDateApr'],0,1,f['open.date']);
 			vars['$extRecipientApr'] = _ins(vars['$extRecipientApr'],0,1,_getval(f['subscriber'],'contacts','contact.name','full_name'))
 			var ar = new SCFile('accessRequest');
-			var upd = ar.doSelect('subscription.id="'+approvedAR[i]+'" and category="Изменение"');
+			var upd = ar.doSelect('subscription.id="'+f['subscriptionID']+'" and category="Изменение"');
 			ar['sd.id'] = incidentID;
 			ar.doUpdate();
 		}
@@ -1457,15 +1461,17 @@ function createARMod(){
 			vars['$roleDateApr'] = _ins(vars['$roleDateApr'],0,1,f['open.date'])
 			vars['$roleRecipientApr'] = _ins(vars['$roleRecipientApr'],0,1,_getval(f['subscriber'],'contacts','contact.name','full_name'))
 			var ar = new SCFile('accessRequest');
-			var upd = ar.doSelect('subscription.id="'+approvedAR[i]+'" and category="Изменение"');
+			var upd = ar.doSelect('subscription.id="'+f['subscriptionID']+'" and category="Изменение"');
 			ar['sd.id'] = incidentID;
-			ar.doUpdate();
+			var upd  = ar.doUpdate();
 		}
 	}
 }
 
 
+//	отзыв доступа
 function createARRM(){
+	print('not sd');
 	var incidentID;
 	var inc = new SCFile('incidents');
 	var affItem = getCompanyInInitpoints();
@@ -1481,18 +1487,16 @@ function createARRM(){
 			}
 		}while(compound.getNext() == RC_SUCCESS)
 	}
-	//inc['category'] =
-	//inc['subcategory'] =
+
 	inc['callback.contact'] = _op();
 	inc['title'] = 'Изменение доступа';
 	inc['description'][0] = vars['$reason'];
 	inc['contact.name'] = _op()
 	inc['affected.item'] = affItem
-	inc['category'] = 'Change'
-	inc['subcategory'] = 'Access'
+	inc['category'] = 'request for change'
+	inc['subcategory'] = 'access request'
 	inc['severity'] = 'Средняя'
 	inc['ci.name'] = _getval(affItem,'device','logical.name','ci_name');
-	//inc.doAction('add');
 
 
 	var successCount = 0;
@@ -1504,9 +1508,9 @@ function createARRM(){
 	var file = new SCFile('accessRequest');
 		for (var i = 0; i < _lng(vars['$lo.subscriber']); i++){
 			var f = new SCFile('accessRequest');
-			var rcc = f.doSelect('subscription.id="'+vars['$lo.subscriberID'][i]+'" and category="Отзыв"')
+			var rcc = f.doSelect('subscription.id="'+vars['$lo.subscriberID'][i]+'" and category="Отзыв"  and active=true')
 			if(rcc != RC_SUCCESS){
-			file['id'] = lib.ARUtils.GetNextNumber('accessRequest');
+				file['id'] = lib.ARUtils.GetNextNumber('accessRequest');
 				file['cis.bzs.id'][0] = _getval(vars['$lo.subscriberID'][i],'Subscription','subscriptionID','serviceName');
 				file['cis.acss.id'][0] = _getval(vars['$lo.subscriberID'][i],'Subscription','subscriptionID','acss_id');
 				file['cis.right.id'][0] = _getval(vars['$lo.subscriberID'][i],'Subscription','subscriptionID','right_id');
@@ -1531,15 +1535,16 @@ function createARRM(){
 				}
 			}
 			else{
-				print(' - '+_conts(f));
+				//print(' - '+_conts(f));
 				rejectedAR.push(f['id']);
 			}
 		}
 
 	for(var i = 0; i < _lng(vars['$lo.roleSubscriber']); i++){
 		var f = new SCFile('accessRequest');
-		var rcc = f.doSelect('subscription.id="'+vars['$lo.roleSubscriberID'][i]+'" and category="Отзыв"')
+		var rcc = f.doSelect('subscription.id="'+vars['$lo.roleSubscriberID'][i]+'" and category="Отзыв"  and active=true')
 		if(rcc != RC_SUCCESS){
+			file['id'] = lib.ARUtils.GetNextNumber('accessRequest');
 			file['recipient'] = vars['$lo.roleSubscriber'][i];
 			file['category'] = 'Отзыв';	//предоставление изменние отзыв
 			file['type'] = 'Ролевой';		//базовый расширеный ролевой
@@ -1602,7 +1607,7 @@ function createARRM(){
 			vars['$extDateApr'] = _ins(vars['$extDateApr'],0,1,f['open.date']);
 			vars['$extRecipientApr'] = _ins(vars['$extRecipientApr'],0,1,_getval(f['subscriber'],'contacts','contact.name','full_name'))
 			var ar = new SCFile('accessRequest');
-			var upd = ar.doSelect('subscription.id="'+approvedAR[i]+'" and category="Отзыв"');
+			var upd = ar.doSelect('subscription.id="'+f['subscriptionID']+'" and category="Отзыв"');
 			ar['sd.id'] = incidentID;
 			ar.doUpdate();
 			//print('rcs = '+RCtoString(upd))
@@ -1616,7 +1621,7 @@ function createARRM(){
 			vars['$roleDateApr'] = _ins(vars['$roleDateApr'],0,1,f['open.date'])
 			vars['$roleRecipientApr'] = _ins(vars['$roleRecipientApr'],0,1,_getval(f['subscriber'],'contacts','contact.name','full_name'))
 			var ar = new SCFile('accessRequest');
-			var upd = ar.doSelect('subscription.id="'+approvedAR[i]+'" and category="Отзыв"');
+			var upd = ar.doSelect('subscription.id="'+f['subscriptionID']+'" and category="Отзыв"');
 			ar['sd.id'] = incidentID;
 			ar.doUpdate();
 		}
@@ -1702,20 +1707,22 @@ function updateCID(sdId,cId){
 function createCM3T(CHANGE) {
 	var ar = new SCFile('accessRequest');
 	var rc = ar.doSelect('c.id="'+CHANGE['number']+'"');
+	var createdTasks = []
 	if(rc == RC_SUCCESS){
 		//print('ar ok');
 		do{
-			if(ar['type'] = 'Ролевой'){
-			//	print('role');
+			//print(ar['type']);
+			if(ar['type'] =='Ролевой'){
+				//print('role');
 				var d = new SCFile('device')
 				var rrc = d.doSelect('logical.name="'+ar['role.logical.name']+'"')
 				if(rrc == RC_SUCCESS){
 					for(var i = 0; i < _lng(d['bzs.id']); i++){
 						var file = new SCFile('cm3t')
 						var number
-						print(d['bzs.id'][i]);
+						//print(d['bzs.id'][i]);
 						file['parent.change'] = CHANGE['number'];
-						file['category'] = 'PIR';	//test
+						file['category'] = 'Ролевой доступ';
 						file['affected.item'] = CHANGE['affected.item'];
 						file['initial.impact'] = '4'
 						file['severity'] = '3'
@@ -1738,93 +1745,176 @@ function createCM3T(CHANGE) {
 							f['title'] = 'test title';
 							f['description'] = ['Требуется '+ar['category']+' в связи с '+ar['description']];
 							f.doUpdate();
+							createdTasks.push(f['number']);
 						}
+						ar['ct.id'] = number;
+						ar.doUpdate();
 					}
 				}
 			}
 			else{
+				//print('ext');
 				var file = new SCFile('cm3t')
 				var number
-				file['category'] = 'Стандартное изменение';
+				file['category'] = 'Расширеный доступ';
 				file['affected.item'] = CHANGE['affected.item'];
 				file['initial.impact'] = '4'
-				file['severity'] = 'Низкая'
+				file['severity'] = '3'
 				file['priority.code'] = '3'
 				file['risk.assessment'] = '1'
 				file['planned.start'] = ar['start.date']
 				file['planned.end'] = ar['end.date']
 				file['need.accept'] = true
 				file['brief.desc'] = ar['category']
-				file['description'].push('Требуется '+ar['category'] +'в связи с '+ar['description']);
+				file['description']=['Требуется '+ar['category'] +'в связи с '+ar['description']];
+				file['bzs.id'] = ar['cis.bzs.id'][i];
+				file['accs.id'] = ar['cis.acss.id'][i];
+				file['right.id'] = ar['cis.right.id'][i];
 				//print('create task');
 				number = task_new(file,CHANGE)
+				//print('number = '+number);
+				var f = new SCFile('cm3t')
 				if(number != null){
 					var rc = f.doSelect('number="'+number+'"');
 					f['brief.desc'] = ar['category'];
 					f['title'] = ar['category'];
 					f['description'] = ['Требуется '+ar['category']+' в связи с '+ar['description']];
 					f.doUpdate();
+					createdTasks.push(f['number']);
 				}
+				ar['ct.id'] = number;
+				ar.doUpdate();
 			}
 			// ?????? file['assign.dept']
 		}while(ar.getNext() == RC_SUCCESS)
 	}
+	//print('to ret = '+createdTasks);
+	return createdTasks
 }
 
 function createSubscription(change){
+	print('start create sub');
+	print('change = '+change);
 	var file = new SCFile('Subscription');
 	var ar = new SCFile('accessRequest');
-	//TODO доп условие выборке правильных ar
-	//		проставить статус закрытия
-	var rc = ar.doSelect('c.id="'+change+'"')
+	var rc = ar.doSelect('c.id="'+change['number']+'" and status="Закрыт"')
+	//print('ar = '+ar);
 	if(rc == RC_SUCCESS){
 		do{
-			if(ar['type == Ролевой']){
-				file['svcCatItem']  = 'Изменение'
-				file['role.id'] = ar['role.logical.name'];
-				file['role.name'] = ar['role.ci.name'];
-				if(ar['category'] == 'Отзыв'){
-					file['active'] = false
+			if(ar['subscription.id']==null){								//	не существует записи subscription
+				print('new sub');
+				//print('ar type = '+ar['type']);
+				if(ar['type'] == 'Ролевой'){
+					print('role');
+					file['svcCatItem']  = 'Изменение'
+					file['role.id'] = ar['role.logical.name'];
+					file['role.name'] = ar['role.ci.name'];
+					if(ar['category'] == 'Отзыв'){
+						print('отзыв');
+						file['active'] = false
+					}
+					else{
+						print('не отзыв');
+						file['active'] = true
+					}
+					file['subscriber'] = ar['recipient'];
+					file['subscriberType'] = _getval(ar['recipient'],'contacts','contact.name','type');
+					file['open.id'] = change['number']
+					file['close.id'] = change['number']
+					file['open.date'] = change['inf.close.time'];
+					file['close.date'] = change['inf.close.time'];
+					file['plan.close.date'] = ar['end.date'];
+					file['type'] = 'Ролевой доступ'
+					file.doInsert()
 				}
 				else{
-					file['active'] = true
+					print('раcширеныйж')
+					file['svcCatItem']  = 'Задача на изменение'
+					file['serviceName'] = ar['cis.bzs.id'];
+					file['displayName'] = ar['cis.bzs.name'];
+					file['acss.id'] = ar['cis.acss.id']
+					file['acss.name'] = ar['cis.acss.name']
+					file['right.id'] = ar['cis.right.id']
+					file['right.name'] = ar['cis.right.name']
+					if(ar['category'] == 'Отзыв'){
+						print('отзыв');
+						file['active'] = false
+					}
+					else{
+						print('не отзыв');
+						file['active'] = true
+					}
+					file['subscriber'] = ar['recipient'];
+					file['subscriberType'] = _getval(ar['recipient'],'contacts','contact.name','type');
+					file['open.id'] = change['number']
+					file['close.id'] = change['number']
+					file['open.date'] = change['inf.close.time'];
+					file['close.date'] = change['inf.close.time'];
+					file['plan.close.date'] = ar['end.date'];
+					file['type'] = 'Расширенный доступ'
+					file.doInsert()
 				}
-				file['subscriber'] = ar['recipient'];
-				file['subscriberType'] = _getval(ar['recipient'],'contacts','contact.name','type');
-				file['open.id'] = change
-				file['close.id'] = change
-				file['open.date'] = change['inf.close.time'];
-				file['close.date'] = change['inf.close.time'];
-				file['plan.close.date'] = ar['end.date'];
-				file.doInsert()
 			}
-			else{
-				file['svcCatItem']  = 'Задача на изменение'
-				file['serviceName'] = ar['cis.bzs.id'];
-				file['displayName'] = ar['cis.bzs.name'];
-				file['acss.id'] = ar['cis.acss.id']
-				file['acss.name'] = ar['cis.acss.name']
-				file['right.id'] = ar['cis.right.id']
-				file['right.name'] = ar['cis.right.name']
-				if(ar['category'] == 'Отзыв'){
-					file['active'] = false
+			else{																					// существует subscription
+				print('update sub');
+				var rc = file.doSelect('subscriptionID="'+ar['subscription.id']+'"')				// вместо создания обновить эту запись
+				if(rc == RC_SUCCESS){
+					if(ar['type'] == 'Ролевой'){
+						print('ролевой');
+						file['svcCatItem']  = 'Изменение'
+						file['role.id'] = ar['role.logical.name'];
+						file['role.name'] = ar['role.ci.name'];
+						if(ar['category'] == 'Отзыв'){
+							print('отзыв');
+							file['active'] = false
+						}
+						else{
+							print('не отзыв');
+							file['active'] = true
+						}
+						file['subscriber'] = ar['recipient'];
+						file['subscriberType'] = _getval(ar['recipient'],'contacts','contact.name','type');
+						file['open.id'] = change['number']
+						file['close.id'] = change['number']
+						file['open.date'] = change['inf.close.time'];
+						file['close.date'] = change['inf.close.time'];
+						file['plan.close.date'] = ar['end.date'];
+						file.doUpdate()
+					}
+					else{
+					print('расширеный');
+						file['svcCatItem']  = 'Задача на изменение'
+						file['serviceName'] = ar['cis.bzs.id'];
+						file['displayName'] = ar['cis.bzs.name'];
+						file['acss.id'] = ar['cis.acss.id']
+						file['acss.name'] = ar['cis.acss.name']
+						file['right.id'] = ar['cis.right.id']
+						file['right.name'] = ar['cis.right.name']
+						if(ar['category'] == 'Отзыв'){
+							print('отзыв');
+							file['active'] = false
+						}
+						else{
+							print('не отзыв');
+							file['active'] = true
+						}
+						file['subscriber'] = ar['recipient'];
+						file['subscriberType'] = _getval(ar['recipient'],'contacts','contact.name','type');
+						file['open.id'] = change['number']
+						file['close.id'] = change['number']
+						file['open.date'] = change['inf.close.time'];
+						file['close.date'] = change['inf.close.time'];
+						file['plan.close.date'] = ar['end.date'];
+						file.doUpdate()
+					}
 				}
-				else{
-					file['active'] = true
-				}
-				file['subscriber'] = ar['recipient'];
-				file['subscriberType'] = _getval(ar['recipient'],'contacts','contact.name','type');
-				file['open.id'] = change
-				file['close.id'] = change
-				file['open.date'] = change['inf.close.time'];
-				file['close.date'] = change['inf.close.time'];
-				file['plan.close.date'] = ar['end.date'];
-				file.doInsert()
 			}
 		}while(ar.getNext() == RC_SUCCESS)
 	}
 }
 
+
+//	запрос ролевого доступа из sd
 function createARGetRoles__SD(recipents,roles,roleNames,desc,start,end){
 	var incidentID = vars['$lo.sdID'];
 	var inc = new SCFile('incidents');
@@ -1868,7 +1958,7 @@ function createARGetRoles__SD(recipents,roles,roleNames,desc,start,end){
 	for(var recipientCount = 0; recipientCount < recipents.length(); recipientCount++){
 		for(var attribCount = 0; attribCount < rolesArray.length; attribCount++){
 			var f = new SCFile('accessRequest');
-			var rcc = f.doSelect('recipient="'+recipents[i]+'" and role.logical.name="'+rolesArray[attribCount]+'" and category="Предоставление"')
+			var rcc = f.doSelect('recipient="'+recipents[i]+'" and role.logical.name="'+rolesArray[attribCount]+'" and category="Предоставление" and active=true')
 			if(rcc != RC_SUCCESS){
 				var s = new SCFile('Subscription');
 				var rrc = s.doSelect('subscriber="'+recipents[i]+'" and role.id="'+rolesArray[attribCount]+'"')
@@ -1879,7 +1969,7 @@ function createARGetRoles__SD(recipents,roles,roleNames,desc,start,end){
 					file['oper.open'] = _op();
 					file['recipient'] = recipents[recipientCount];
 					file['category'] = 'Предоставление';	//предоставление изменние отзыв
-					file['type'] = 'Ролевой';		//базовый расширеный ролевой
+					file['type'] = 'Ролевой';		//базовый расширеный ролевойf
 					file['description'] = desc;
 					file['role.logical.name'] = rolesArray[attribCount];
 					file['role.ci.name'] = roleNames[attribCount];
@@ -1937,13 +2027,14 @@ function createARGetRoles__SD(recipents,roles,roleNames,desc,start,end){
 			vars['$roleRecipientApr'] = _ins(vars['$roleRecipientApr'],0,1,_getval(f['recipient'],'contacts','contact.name','full_name'))
 			var ar = new SCFile('accessRequest');
 			var upd = ar.doSelect('id="'+approvedAR[i]+'" and category="Изменение"');
-			ar['sd.id'] = incidentID;
-			ar.doUpdate();
+			f['sd.id'] = incidentID;
+			f.doUpdate();
 		}
 	}
 
 }
 
+// запрос расширенного доступа из sd
 function createARGetExt__SD(serviceIds,serviceNames,accsIds,acssNames,rightIds,rightNames,desc,start,end){
 	var incidentID = vars['$lo.SDid'];
 	var inc = new SCFile('incidents');
@@ -1983,7 +2074,7 @@ function createARGetExt__SD(serviceIds,serviceNames,accsIds,acssNames,rightIds,r
 	for(var recipientCount = 0; recipientCount < _lng(vars['$recIDs']); recipientCount++){
 		for(var attribCount = 0; attribCount < serviceIds.length(); attribCount++){
 			var f = new SCFile('accessRequest');
-			var rcc = f.doSelect('recipient="'+vars['$recIDs'][i]+'" and cis.bzs.id="'+serviceIds[attribCount]+'" and cis.acss.id="'+accsIds[attribCount]+'" and cis.right.id="'+rightIds[attribCount]+'" and category="Предоставление"')
+			var rcc = f.doSelect('recipient="'+vars['$recIDs'][i]+'" and cis.bzs.id="'+serviceIds[attribCount]+'" and cis.acss.id="'+accsIds[attribCount]+'" and cis.right.id="'+rightIds[attribCount]+'" and category="Предоставление"  and active=true')
 			if(rcc != RC_SUCCESS){
 				var s = new SCFile('Subscription');
 				var rrc = s.doSelect('subscriber="'+vars['$recIDs'][i]+'" and serviceName="'+serviceIds[attribCount]+'" and acss.id="'+accsIds[attribCount]+'" and right.id="'+rightIds[attribCount]+'" and type="Расширенный доступ" and active=true')
@@ -2061,13 +2152,14 @@ function createARGetExt__SD(serviceIds,serviceNames,accsIds,acssNames,rightIds,r
 			vars['$extRecipientApr'] = _ins(vars['$extRecipientApr'],0,1,_getval(f['recipient'],'contacts','contact.name','full_name'))
 			var ar = new SCFile('accessRequest');
 			var upd = ar.doSelect('id="'+approvedAR[i]+'" and category="Запрос"');
-			ar['sd.id'] = incidentID;
-			ar.doUpdate();
+			f['sd.id'] = incidentID;
+			f.doUpdate();
 		}
 	}
 
 }
 
+//	изменение доступа из SD
 function createARMod_SD(){
 	var incidentID = vars['$lo.SDid'];
 	var inc = new SCFile('incidents');
@@ -2139,7 +2231,7 @@ function createARMod_SD(){
 					}
 				}
 				else{
-					print(' - '+_conts(f));
+					//print(' - '+_conts(f));
 					rejectedAR.push(f['id']);
 				}
 			}
@@ -2174,7 +2266,7 @@ function createARMod_SD(){
 					}
 				}
 				else{
-					print(' - '+_conts(f));
+					//print(' - '+_conts(f));
 					rejectedAR.push(f['id']);
 				}
 			}
@@ -2264,6 +2356,7 @@ function createARMod_SD(){
 	}
 }
 
+//	отзыв доступа из sd
 function createARRM__SD(){
 	var incidentID = vars['$lo.SDid'];
 	var inc = new SCFile('incidents');
@@ -2303,9 +2396,9 @@ function createARRM__SD(){
 	var file = new SCFile('accessRequest');
 		for (var i = 0; i < _lng(vars['$lo.subscriber']); i++){
 			var f = new SCFile('accessRequest');
-			var rcc = f.doSelect('subscription.id="'+vars['$lo.subscriberID'][i]+'" and category="Отзыв"')
+			var rcc = f.doSelect('subscription.id="'+vars['$lo.subscriberID'][i]+'" and category="Отзыв"  and active=true')
 			if(rcc != RC_SUCCESS){
-			file['id'] = lib.ARUtils.GetNextNumber('accessRequest');
+				file['id'] = lib.ARUtils.GetNextNumber('accessRequest');
 				file['cis.bzs.id'][0] = _getval(vars['$lo.subscriberID'][i],'Subscription','subscriptionID','serviceName');
 				file['cis.acss.id'][0] = _getval(vars['$lo.subscriberID'][i],'Subscription','subscriptionID','acss_id');
 				file['cis.right.id'][0] = _getval(vars['$lo.subscriberID'][i],'Subscription','subscriptionID','right_id');
@@ -2330,15 +2423,16 @@ function createARRM__SD(){
 				}
 			}
 			else{
-				print(' - '+_conts(f));
+				//print(' - '+_conts(f));
 				rejectedAR.push(f['id']);
 			}
 		}
 
 	for(var i = 0; i < _lng(vars['$lo.roleSubscriber']); i++){
 		var f = new SCFile('accessRequest');
-		var rcc = f.doSelect('subscription.id="'+vars['$lo.roleSubscriberID'][i]+'" and category="Отзыв"')
+		var rcc = f.doSelect('subscription.id="'+vars['$lo.roleSubscriberID'][i]+'" and category="Отзыв"  and active=true')
 		if(rcc != RC_SUCCESS){
+			file['id'] = lib.ARUtils.GetNextNumber('accessRequest');
 			file['recipient'] = vars['$lo.roleSubscriber'][i];
 			file['category'] = 'Отзыв';	//предоставление изменние отзыв
 			file['type'] = 'Ролевой';		//базовый расширеный ролевой
@@ -2440,6 +2534,7 @@ function closeAR(ctID){
 	var rc = file.doSelect('ct.id="'+ctID+'"')
 	if(rc == RC_SUCCESS){
 		file['status'] = 'Закрыт'
+		file['closure.code']='1'
 		file.doUpdate();
 	}
 }
