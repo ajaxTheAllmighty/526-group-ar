@@ -102,16 +102,33 @@ mod
 		incidents
 		cm3r
 		cm3t
+	sl
+		deviceUtils
+
+ручные действия
+	dbdict
+		incidents
+			создать алиас для поля incident.id с названием incident.id.ar.vj
+		cm3r
+			создать алиас для поля number с названием number.ar.vj
+		cm3t
+			создать алиас для поля parent.change с названием parent.change.ar.vj
+			bzs.id	Знак (60)
+			accs.id	Знак (60)
+			right.id	Знак (60)
 	workflow
 		DDC Service Desk
+			В действия на основании рабочего процесса добавить inf.ar.create.from.sd с условием RAD jscall("ARUtils.ARExists", incident.id in $L.file)
 		DDC Generic Task
+			На ручной переход из фазы Оценка в фазу Закрытие добавить inf.ar.close
 		INF Standard Change
-	dbdict
-		cm3t
-			bzs.id accs.id right.id	text
-ручные действия
-	на таблицу incidents создать алиас incident.id.ar.vj
-	на таблицу cm3r создать алиас number.ar.vj
-	на таблицу cm3t создать алиас parent.change.ar.vj
-	перестроить gl Interaction Local Subcategories
-	выполнить команду *aapm.server.initer и перезайти в клиент
+			При переходе из фазы Ввод в эксплуатацию в фазу Изменение завершено добавить inf.create.subscr
+			В фазе Ввод в эксплуатацию создать действие inf.create.tasks с условием RAD approval.status in $L.file="approved" and assigned.to in $L.file=operator()
+	menu
+		ESSSM-ERG
+			Описание Запросить доступ			Приложение wizard.run	Имя параметра name	Значение параметра INF.accessRequest-get	Условие true
+			Описание Запросить изменение доступа	Приложение wizard.run	Имя параметра name	Значение параметра INF.accessRequest-mod	Условие true
+			Описание Запросить отзыв доступа		Приложение wizard.run	Имя параметра name	Значение параметра INF.accessRequest-rm		Условие true
+
+перестроить gl Interaction Local Subcategories
+выполнить команду *aapm.server.initer и перезайти в клиент
