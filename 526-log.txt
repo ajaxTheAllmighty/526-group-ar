@@ -25,6 +25,8 @@ create
 		inf.cm3t.bzs.vj
 		inf.cm3t.accs.vj
 		inf.cm3t.right.vj
+		INF.wizard.accessRM
+		contacts.search.g_type
 	wizards
 		INF.accessRequest-get
 		INF.accessRequest-get-roles
@@ -81,9 +83,11 @@ create
 	sdSubcategory:
  		access request
 	scmessage:
-		massage.id=access request;request for change
+		message.id=access request;request for change
 	triggers
 		inf.after.add.updateCID_AR
+	number
+		accessRequest
 mod
 	sdCategory:
  		request for change

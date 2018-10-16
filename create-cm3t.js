@@ -1,20 +1,26 @@
-function docnew_cm3t(rec){
-	var rteReturnValue = new SCDatum();
-  	var rteNames = new SCDatum();
-  	var rteVals = new SCDatum();
-	rteNames.setType(8); //type array
-	rteNames.push("file");        //Notification Name - INTO.NAME
-	rteNames.push("name");      //Current File - INTO.FILE
-	rteNames.push("prompt");
-	rteNames.push("description");
-	rteVals.setType(8);
-	rteVals.push(rec); // Interaction Record
-	rteVals.push("cm3t");	//RuleSet Name //TODO: на текущий момент такого не существует
-	rteVals.push(true)
-	rteVals.push("add")
-	system.functions.rtecall("callrad",rteReturnValue,"document.new",rteNames,rteVals,false);
-	return rec['number']
+for(var i = 0; i < approvedAR.length; i++){
+	var f = new SCFile('accessRequest');
+	var rc = f.doSelect('id="'+approvedAR[i]+'"')
+	if(rc == RC_SUCCESS){
+		vars['$roleApr'] = _ins(vars['$roleApr'],0,1,f['role.ci.name'])
+		vars['$roleDateApr'] = _ins(vars['$roleDateApr'],0,1,f['date.open'])
+		vars['$roleRecipientApr'] = _ins(vars['$roleRecipientApr'],0,1,_getval(f['recipient'],'contacts','contact.name','full_name'))
+		var ar = new SCFile('accessRequest');
+		var upd = ar.doSelect('id="'+approvedAR[i]+'" and category="Изменение"');
+		f['sd.id'] = incidentID;
+		f.doUpdate();
+	}
 }
+
+
+
+
+
+
+
+
+
+
 
 function createCM3T(CHANGE) {
 	var ar = new SCFile('accessRequest');
