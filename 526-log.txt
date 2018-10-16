@@ -121,6 +121,8 @@ mod
 			bzs.id	Знак (60)
 			accs.id	Знак (60)
 			right.id	Знак (60)
+		contacts
+			contact.type Знак (60)
 	workflow
 		DDC Service Desk
 			В действия на основании рабочего процесса добавить inf.ar.create.from.sd с условием RAD jscall("ARUtils.ARExists", incident.id in $L.file)
