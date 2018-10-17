@@ -1819,7 +1819,7 @@ function createSubscription(change){
 						file['active'] = true
 					}
 					file['subscriber'] = ar['recipient'];
-					file['subscriberType'] = _getval(ar['recipient'],'contacts','contact.name','type');
+					file['subscriberType'] = _getval(ar['recipient'], 'contacts', 'contact.name', 'contact_type');
 					file['open.id'] = change['number']
 					file['close.id'] = change['number']
 					file['open.date'] = change['inf.close.time'];
@@ -1846,7 +1846,7 @@ function createSubscription(change){
 						file['active'] = true
 					}
 					file['subscriber'] = ar['recipient'];
-					file['subscriberType'] = _getval(ar['recipient'],'contacts','contact.name','type');
+					file['subscriberType'] = _getval(ar['recipient'], 'contacts', 'contact.name', 'contact_type');
 					file['open.id'] = change['number']
 					file['close.id'] = change['number']
 					file['open.date'] = change['inf.close.time'];
@@ -1874,7 +1874,7 @@ function createSubscription(change){
 							file['active'] = true
 						}
 						file['subscriber'] = ar['recipient'];
-						file['subscriberType'] = _getval(ar['recipient'],'contacts','contact.name','type');
+						file['subscriberType'] = _getval(ar['recipient'], 'contacts', 'contact.name', 'contact_type');
 						file['open.id'] = change['number']
 						file['close.id'] = change['number']
 						file['open.date'] = change['inf.close.time'];
@@ -1900,7 +1900,7 @@ function createSubscription(change){
 							file['active'] = true
 						}
 						file['subscriber'] = ar['recipient'];
-						file['subscriberType'] = _getval(ar['recipient'],'contacts','contact.name','type');
+						file['subscriberType'] = _getval(ar['recipient'], 'contacts', 'contact.name', 'contact_type');
 						file['open.id'] = change['number']
 						file['close.id'] = change['number']
 						file['open.date'] = change['inf.close.time'];
@@ -1994,7 +1994,7 @@ function createARGetRoles__SD(recipents,roles,roleNames,desc,start,end){
 			}
 		}
 	}
-	print(rejectedAR,rejectedARSUB);
+	//print(rejectedAR,rejectedARSUB);
 	for(var i = 0; i < rejectedAR.length; i++){
 		var f = new SCFile('accessRequest');
 		var rc = f.doSelect('id="'+rejectedAR[i]+'"')
@@ -2539,5 +2539,28 @@ function closeAR(ctID){
 		file['date.close'] = _tod();
 		file['oper.close'] = _op();
 		file.doUpdate();
+	}
+}
+
+
+function setApproveStatus(changeID){
+	var file = new SCFile('accessRequest');
+	var rc = file.doSelect('c.id="'+changeID+'"')
+	if(rc == RC_SUCCESS){
+		do{
+			file['approval.status'] = 'Согласовано'
+			file.doUpdate();
+		}while(file.getNext() == RC_SUCCESS)
+	}
+}
+
+function setDisApproveStatus(changeID){
+	var file = new SCFile('accessRequest');
+	var rc = file.doSelect('c.id="'+changeID+'"')
+	if(rc == RC_SUCCESS){
+		do{
+			file['approval.status'] = 'Не согласовано'
+			file.doUpdate();
+		}while(file.getNext() == RC_SUCCESS)
 	}
 }

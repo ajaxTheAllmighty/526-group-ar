@@ -1,5 +1,3 @@
-526_15102018_part1.unl
-
 create
 	dbdict
 		accessRequest
@@ -103,6 +101,7 @@ mod
 		chm.open
 		chm.update
 		chm.task
+		contacts.g
 	link
 		incidents
 		cm3r
@@ -118,11 +117,11 @@ mod
 			создать алиас для поля number с названием number.ar.vj
 		cm3t
 			создать алиас для поля parent.change с названием parent.change.ar.vj
-			bzs.id	Знак (60)
-			accs.id	Знак (60)
-			right.id	Знак (60)
+			создать поле bzs.id		Знак (60)
+			создать поле accs.id	Знак (60)
+			создать поле right.id	Знак (60)
 		contacts
-			contact.type Знак (60)
+			создать поле contact.type Знак (60)
 	workflow
 		DDC Service Desk
 			В действия на основании рабочего процесса добавить inf.ar.create.from.sd с условием RAD jscall("ARUtils.ARExists", incident.id in $L.file)
@@ -136,6 +135,9 @@ mod
 			Описание Запросить доступ			Приложение wizard.run	Имя параметра name	Значение параметра INF.accessRequest-get	Условие true
 			Описание Запросить изменение доступа	Приложение wizard.run	Имя параметра name	Значение параметра INF.accessRequest-mod	Условие true
 			Описание Запросить отзыв доступа		Приложение wizard.run	Имя параметра name	Значение параметра INF.accessRequest-rm		Условие true
+	datadict
+			contacts
+				для поля contact.type задать значение "Тип контакта"
 
 перестроить gl Interaction Local Subcategories
 выполнить команду *aapm.server.initer и перезайти в клиент
