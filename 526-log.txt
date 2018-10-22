@@ -124,7 +124,7 @@ mod
 			создать поле contact.type Знак (60)
 	workflow
 		DDC Service Desk
-			В действия на основании рабочего процесса добавить inf.ar.create.from.sd с условием RAD jscall("ARUtils.ARExists", incident.id in $L.file)
+			В действия на основании рабочего процесса добавить inf.ar.create.from.sd с условием RAD jscall("ARUtils.ARExists", incident.id in $L.file) Действие при завершении "Сохранить" Требует блокировки "true"
 		DDC Generic Task
 			На ручной переход из фазы Оценка в фазу Закрытие добавить inf.ar.close
 		INF Standard Change
@@ -141,3 +141,47 @@ mod
 
 перестроить gl Interaction Local Subcategories
 выполнить команду *aapm.server.initer и перезайти в клиент
+
+
+
+
+
+
+
+
+
+
+фикс 18.10
+	add
+		do
+			INF.acccesRequest-get-ext_add_recipient
+			INF.acccesRequest-get-roles_redraw_1
+			INF.accessRequest-mod-ext_add_recipient
+			INF.accessRequest-rm_add_recipient
+			INF.acccesRequest-get-ext_delete_recipient
+			INF.acccesRequest-get-roles_delete_recipient
+			INF.acccesRequest-mod-ext_delete_recipient
+			INF.accessRequest-rm_delete_recipient
+			INF.acccesRequest-get-roles_delete_role
+			INF.acccesRequest-get-roles_add_role
+	mod
+		fd
+			accessRequestGet-ext
+			accessRequestGet-roles
+			accessRequest-mod
+			accessRequest-rm
+		ruleset
+			inf.create.tasks
+		sl
+			ARUtils
+
+
+
+фикс 22.10
+	mod
+		fd
+			accessRequest-rm
+		link
+			accessRequest-rm
+		sl
+			ARUtils
