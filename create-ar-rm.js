@@ -1,40 +1,55 @@
-function createARRM(){
-	var file = new SCFile('accessRequest');
-	for(var attribCount = 0; i < _lng(vars['$action']), attribCount++){
-		if(vars['$bzs']!=null && vars['$bzsID']!=null && vars['$accs']!=null && vars['$accsID']!=null && vars['$right']!=null && vars['$rightID']!=null){
-			file['initiator'] = _op();
-			file['date.open'] = _tod();
-			file['oper.open'] = _op();
-			file['recipient'] = recipents[recipientCount];
-			file['category'] = 'Отзыв';	//предоставление изменние отзыв
-			file['type'] = 'Расширеный';		//базовый расширеный ролевой
-			file['description'] = desc;
-			file['cis.bzs.id'][0] = vars['bzsID'][attribCount];
-			file['cis.bzs.name'][0] = vars['bzs'][attribCount];
-			file['cis.acss.id'][0] = vars['$accsID'][attribCount];
-			file['cis.acss.name'][0] = vars['$accs'][attribCount];
-			file['cis.right.id'][0] = vars['$rightID'][attribCount];
-			file['cis.right.name'][0] = vars['$right'][attribCount];
-			file['company'] = vars['$lo.operator']['company'];
-			var rc = file.doInsert();
-			print(RCtoString(rc));
-		}
-	}
-	for(var attribCount = 0; i < _lng(vars['$roleAction']), attribCount++){
-		if(vars['$role']!=null && vars['$roleID']!=null){
-			file['initiator'] = _op();
-			file['date.open'] = _tod();
-			file['oper.open'] = _op();
-			file['recipient'] = recipents[recipientCount];
-			file['category'] = 'Отзыв';	//предоставление изменние отзыв
-			file['type'] = 'Ролевой';		//базовый расширеный ролевой
-			file['description'] = desc;
-			file['role.logical.name'] = vars['$roleID'][attribCount];
-			file['role.ci.name'] = vars['$role'][attribCount];
-			file['company'] = vars['$lo.operator']['company'];
-			var rc = file.doInsert();
-			print(RCtoString(rc));
-		}
+//roleAccessTable
 
+
+function buildRemoveTable__roles(recipients){
+	var roles = [];
+	var roleIDs = [];
+	var subIDs = [];
+	var recIDs = [];
+	var subscribers = [];
+	var subscriptionIDs = [];
+	var goodRoles = []
+	var goodIds = []
+	var conts = new SCFile('contacts');
+	var file = new SCFile('Subscription');
+	for(var i  = 0; i < _lng(vars['$recIDs']); i++){
+		var rc = file.doSelect('subscriber="'+vars['$recIDs'][i]+'" and type="Ролевой доступ" and active=true'); //Дописать активность записи
+		if(rc == RC_SUCCESS){
+			do{
+				roles.push(file['role.name']);
+				roleIDs.push(file['role.id']);
+			}while(file.getNext() == RC_SUCCESS)
+		}
+		else{
+			roles.push(null)
+			roleIDs.push(null)
+		}
 	}
+	if(_lng(vars['$recIDs']) >1){
+		for(var i = 0; i < roleIDs.length; i++){
+			if(countDuplicates(roleIDs,roleIDs[i]) == _lng(vars['$recIDs'])){
+				goodIds.push(roleIDs[i]);
+				goodRoles.push(_getval(roleIDs[i],'device','logical.name','ci_name'))
+			}
+		}
+		goodRoles = uniqueArray(goodRoles);
+		goodIds = uniqueArray(goodIds);
+		vars['$role'] = goodRoles;
+		vars['$roleID'] = goodIds;
+	}
+		vars['$role'] = roles;
+		vars['$roleID'] = roleIDs;
+
+	for(var i = 0; i < _lng(vars['$roleID']); i++){
+		for(var j = 0; j < _lng(vars['$recIDs']); j++){
+			var s = new SCFile('Subscription');
+			var rc = s.doSelect('subscriber="'+vars['$recIDs'][j]+'" and role.id="'+vars['$roleID'][i]+'" and active=true');
+			if(rc == RC_SUCCESS){
+				subscriptionIDs.push(s['subscriptionID']);
+				subscribers.push(s['subscriber']);
+			}
+		}
+	}
+	vars['$lo.roleSubscriber']=subscribers
+	vars['$lo.roleSubscriberID']=subscriptionIDs
 }
